@@ -56,7 +56,13 @@ Kotlin + Jetpack Compose 写的单模块 App，没有后端、没有账号体系
 
 ## 截图
 
-> 截图待补。放图位置见 [`docs/screenshots/README.md`](docs/screenshots/README.md)。
+| 聊天主页 | 本地知识库 | 设置页 1 |
+| :---: | :---: | :---: |
+| ![聊天主页](docs/screenshots/01-chat.jpg) | ![本地知识库](docs/screenshots/02-kb.jpg) | ![设置页1](docs/screenshots/03-setting1.jpg) |
+
+| 设置页 2 | 设置页 3 |
+| :---: | :---: |
+| ![设置页2](docs/screenshots/04-setting2.jpg) | ![设置页3](docs/screenshots/05-setting3.jpg) |
 
 ## 自己编译
 
