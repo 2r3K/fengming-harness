@@ -1,0 +1,38 @@
+# ---------- 本机配置与密钥：绝不能提交 ----------
+# 正式签名用的证书信息（里面有密码）
+keystore.properties
+# 证书本体
+*.jks
+*.keystore
+# 本机 SDK 路径
+local.properties
+
+# ---------- 编译产物 ----------
+.gradle/
+.kotlin/
+build/
+/app/build/
+/dist/
+/captures/
+*.apk
+*.aab
+*.ap_
+*.zip
+sample/*.zip
+
+# ---------- IDE ----------
+.idea/
+*.iml
+.DS_Store
+.externalNativeBuild
+.cxx
+
+# ---------- 日志与临时 ----------
+*.log
+local.properties.bak
+
+# ---------- Python 工具（tools/mcp-test） ----------
+__pycache__/
+*.py[cod]
+.venv/
+venv/

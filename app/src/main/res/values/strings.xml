@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 桌面图标下面的名字。
+         注意：代码里拼字符串用的是 core/AppInfo.kt 的 NAME，改名字两处一起改。 -->
+    <string name="app_name">奉明Harness</string>
+</resources>

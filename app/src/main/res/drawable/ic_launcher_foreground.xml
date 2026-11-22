@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    应用图标的前景层：白色聊天气泡 + 里头的字母 F。
+
+    为什么用矢量：任何分辨率都清晰、文件只有几百字节、没有版权问题。
+    坐标系 108x108，图形都画在中间 72x72 的安全区内，被各种形状的启动器裁切都不会缺角。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 聊天气泡（白） -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,26 H72 A12,12 0 0 1 84,38 V62 A12,12 0 0 1 72,74 H54 L42,88 V74 H36 A12,12 0 0 1 24,62 V38 A12,12 0 0 1 36,26 Z" />
+
+    <!-- 字母 F（和底色同色，视觉上像"抠"出来的） -->
+    <path
+        android:fillColor="#2F5BEA"
+        android:pathData="M46,40 H68 V46 H54 V51 H64 V57 H54 V62 H46 Z" />
+</vector>
