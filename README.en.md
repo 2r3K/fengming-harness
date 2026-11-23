@@ -40,7 +40,7 @@ Single-module app written in Kotlin + Jetpack Compose. No backend, no account sy
 
 ## Build
 
-Requirements: JDK 17+ (21 recommended), Android SDK with `compileSdk 37`, `minSdk 26`.
+Requirements: JDK 25 (pinned in `gradle/gradle-daemon-jvm.properties`), Android SDK with `platforms;android-37.0` (note the minor version), `build-tools;36.0.0`, `compileSdk 37`, `minSdk 26`.
 
 ```bash
 git clone https://github.com/2r3K/fengming-harness.git

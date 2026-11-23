@@ -62,8 +62,9 @@ Kotlin + Jetpack Compose 写的单模块 App，没有后端、没有账号体系
 
 **要求**
 
-- JDK 17 或更高（推荐 21）
+- JDK 25（`gradle/gradle-daemon-jvm.properties` 里钉的就是 25；别的版本 Gradle 会去下载工具链）
 - Android SDK：`compileSdk 37` / `minSdk 26`（Android 8.0+）
+  - 平台包名是 `platforms;android-37.0`（带小版本号），`build-tools;36.0.0`
 - Gradle 由 wrapper 自带，不用另装
 
 ```bash

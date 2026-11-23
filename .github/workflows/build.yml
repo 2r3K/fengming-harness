@@ -6,31 +6,88 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up JDK 21
+      # 本机用的是 JDK 25（gradle/gradle-daemon-jvm.properties 里也钉的 25），
+      # 这里跟本机保持一致，免得 Gradle 再去 foojay 下载别的版本。
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '25'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'platforms;android-37 build-tools;36.0.0'
+      # 官方 Gradle 缓存 action：缓存 ~/.gradle/caches 和 wrapper，
+      # 第二次跑就不用重新下依赖了（比手写 actions/cache 稳）。
+      - name: Set up Gradle (with cache)
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      # 不再用 android-actions/setup-android：
+      # 它会把预装的 cmdline-tools 换成老版本（日志里的 "Wrong version in
+      # preinstalled sdkmanager"），老 sdkmanager 解析新仓库索引时会挂。
+      # runner 镜像本身已经带好一份很新的 SDK，直接用它自己的 sdkmanager 装缺的组件。
+      - name: Install Android SDK components
+        run: |
+          set -uo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+
+          SDKM="$(find "$SDK/cmdline-tools" -maxdepth 4 -name sdkmanager -type f 2>/dev/null | head -n1)"
+          if [ -z "$SDKM" ]; then
+            echo "::error::找不到 sdkmanager，SDK 路径 $SDK 可能不对"
+            ls -R "$SDK/cmdline-tools" 2>/dev/null | head -50
+            exit 1
+          fi
+          echo "用这个 sdkmanager：$SDKM"
+          "$SDKM" --version || true
+
+          # 接受许可（镜像里一般已经接受了，这里只是兜底）
+          yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+
+          # 关键：Android 17（API 37）的平台包名带小版本号，是 platforms;android-37.0，
+          # 不是 platforms;android-37。两个都试一遍，哪个能装上就用哪个。
+          for pkg in "platforms;android-37.0" "platforms;android-37" "build-tools;36.0.0"; do
+            echo "---- 安装 $pkg"
+            "$SDKM" --install "$pkg" || true
+          done
+
+          echo "---- 已装的 platforms："
+          ls "$SDK/platforms" 2>/dev/null || true
+          echo "---- 已装的 build-tools："
+          ls "$SDK/build-tools" 2>/dev/null || true
+
+          # 稳定渠道里没有的话，放宽到 --channel=3 再试一次（某些新版本只在候选渠道）
+          if [ ! -d "$SDK/platforms/android-37.0" ] && [ ! -d "$SDK/platforms/android-37" ]; then
+            echo "---- 稳定渠道没装上，试 --channel=3"
+            "$SDKM" --install --channel=3 "platforms;android-37.0" || true
+          fi
+
+          if [ ! -d "$SDK/platforms/android-37.0" ] && [ ! -d "$SDK/platforms/android-37" ]; then
+            echo "::error::没装上 android-37 平台，编译必然失败"
+            exit 1
+          fi
+
       - name: Unit tests
-        run: ./gradlew --no-daemon --stacktrace testDebugUnitTest
+        run: ./gradlew --stacktrace testDebugUnitTest
 
       - name: Assemble debug APK
-        run: ./gradlew --no-daemon --stacktrace assembleDebug
+        run: ./gradlew --stacktrace assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
